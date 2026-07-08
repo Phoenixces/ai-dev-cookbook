@@ -1,4 +1,4 @@
-# claude-best-pactices
+# claude-best-practices
 
 ## Developer skills: Input, Tasks, Output
 - mermaid draw skill
