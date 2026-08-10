@@ -24,6 +24,7 @@
 - claude-mem (persistent memory for claude code)
   - /plugin marketplace add thedotmack/claude-mem
   - /plugin install claude-mem
+  - npx claude-mem install --runtime worker
   - npx claude-mem status
-  - npx claude-mem install --runtime server  [Optional - For UI]
+
 
