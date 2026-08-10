@@ -20,6 +20,6 @@
 
 ## Plugins and Tools
 - graphify
-- caveman
-- hermes agent
+- caveman 
+- claude-mem (persistent memory for claude code)
 
