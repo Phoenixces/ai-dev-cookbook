@@ -21,7 +21,7 @@
   - Headroom compresses everything your Al agent reads - tool outputs, logs, RAG chunks, files, and conversation history reaches the LLM. Same answers, fraction of the tokens. 
 2. PONYTAIL (write less code)
   - A Claude Code skill: a "lazy senior dev" mindset, Ships the least code that actually solves it.
-    How it works:
+    <br>How it works:
       Before writing code, the agent stops at the first rung that holds:
       1. Does this need to exist? → no: skip it (YAGNI)
       2. Already in this codebase?
