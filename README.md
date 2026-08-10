@@ -17,7 +17,7 @@
   - red app deployer
  
 ## Open source skills
-1. **HEADROOM **(shrink the input)
+1. **HEADROOM**(shrink the input)
   - Headroom compresses everything your Al agent reads - tool outputs, logs, RAG chunks, files, and conversation history reaches the LLM. Same answers, fraction of the tokens. 
 2. **PONYTAIL** (write less code)
   - A Claude Code skill: a "lazy senior dev" mindset, Ships the least code that actually solves it.
