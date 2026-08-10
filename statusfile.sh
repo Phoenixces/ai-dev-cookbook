@@ -19,7 +19,7 @@ BG_GREEN='\033[42m'; BG_YELLOW='\033[43m'; BG_RED='\033[41m'
 
 # Git branch
 BRANCH=""
-git rev-parse --git-dir > /dev/null 2>&1 && BRANCH=" 🌿 ($(git branch --show-current 2>/dev/null))"
+git rev-parse --git-dir > /dev/null 2>&1 && BRANCH=" ${YELLOW}$(git branch --show-current 2>/dev/null)${RESET}"
 
 PROJECT="${DIR##*/}"
 
@@ -52,7 +52,7 @@ if [ -n "$EFFORT" ]; then
         medium)         EFF_COL="$YELLOW" ;;
         *)              EFF_COL="$GREEN" ;;
     esac
-    EFF_SEG=" | 🧠 ${EFF_COL}${EFFORT}${RESET}"
+    EFF_SEG=" | ${EFF_COL}${EFFORT}${RESET}"
 fi
 
 # Line 1: project | branch | worktree | ctx bar | ⚡ ctx%
