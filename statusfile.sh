@@ -55,11 +55,50 @@ if [ -n "$EFFORT" ]; then
     EFF_SEG=" | ${EFF_COL}${EFFORT}${RESET}"
 fi
 
+# --- Gear segment: real backend from the switchable-llm-gear router ---------
+# Claude's own display_name is a placeholder (router remaps every request), so
+# ask the router what backend is actually active. Fail-silent + hard timeout so
+# a normal (non-routed) session or a down router costs nothing and shows nothing.
+GEAR_SEG=""
+GEAR_ROOT="/Users/I528715/Karuna-SAP/Personal/Projects/switchable-llm-gear"
+GEAR_PORT=$(jq -r '.router_port // 9000' "$GEAR_ROOT/config/config.json" 2>/dev/null)
+GEAR_PORT="${GEAR_PORT:-9000}"
+GEAR_STATE=$(curl -s --max-time 0.2 "localhost:${GEAR_PORT}/state" 2>/dev/null)
+if [ -n "$GEAR_STATE" ]; then
+    # Only claim this session is routed if the router has recently seen a
+    # session attached from THIS cwd. A plain `claude` (not via ccgear) never
+    # talks to the router, so its cwd won't be in sessions[] -> no gear segment.
+    # (Router prunes idle sessions after ~120s.)
+    IS_ROUTED=$(echo "$GEAR_STATE" | jq -r --arg cwd "$DIR" \
+        '((.sessions // []) | map(.cwd) | index($cwd)) != null' 2>/dev/null)
+    if [ "$IS_ROUTED" = "true" ]; then
+        GEAR_KIND=$(echo "$GEAR_STATE" | jq -r '.active.kind // empty' 2>/dev/null)
+        GEAR_ID=$(echo "$GEAR_STATE" | jq -r '.active.model_id // empty' 2>/dev/null)
+        GEAR_UP=$(echo "$GEAR_STATE" | jq -r '.vllm_up // false' 2>/dev/null)
+        # Short label: strip HF org prefix and provider "anthropic--" prefix.
+        GEAR_NAME="${GEAR_ID##*/}"; GEAR_NAME="${GEAR_NAME#anthropic--}"
+        if [ "$GEAR_KIND" = "local" ]; then
+            # amber while vllm still loading, blue once healthy
+            if [ "$GEAR_UP" = "true" ]; then GC="$BLUE"; TAG="▲ LOCAL"; else GC="$YELLOW"; TAG="▲ LOCAL…"; fi
+            GEAR_SEG=" | ${GC}${TAG} ${BOLD}${GEAR_NAME}${RESET}"
+        elif [ "$GEAR_KIND" = "provider" ]; then
+            GEAR_SEG=" | ${RED}▼ CLOUD ${BOLD}${GEAR_NAME}${RESET}"
+        fi
+    fi
+fi
+
 # Line 1: project | branch | worktree | ctx bar | ⚡ ctx%
 echo -e "${BOLD}${YELLOW}${PROJECT}${RESET} |${BRANCH}${WT_SEG} | $(make_bar "$PCT") | ⚡ ctx ${BLUE}${PCT}%${RESET}"
 
-# Line 2: cost CU · cost€ | +lines -lines | model (purple) | effort — usage KPIs blue
-echo -e "🔁 ${BLUE}~${COST_CU} CU${RESET} · ${BLUE}~€${COST_EUR}${RESET} | ${GREEN}+${LINES_ADD}${RESET} ${RED}-${LINES_DEL}${RESET} | ${PURPLE}${MODEL}${RESET}${EFF_SEG}"
+# Line 2: cost CU · cost€ | +lines -lines | model (purple) | gear backend | effort
+# When routed, GEAR_SEG shows the REAL backend; the purple MODEL is the router
+# placeholder — dim it so the gear segment reads as the source of truth.
+if [ -n "$GEAR_SEG" ]; then
+    MODEL_SEG="${DIM}${MODEL}${RESET}"
+else
+    MODEL_SEG="${PURPLE}${MODEL}${RESET}"
+fi
+echo -e "🔁 ${BLUE}~${COST_CU} CU${RESET} · ${BLUE}~€${COST_EUR}${RESET} | ${GREEN}+${LINES_ADD}${RESET} ${RED}-${LINES_DEL}${RESET} | ${MODEL_SEG}${GEAR_SEG}${EFF_SEG}"
 
 # Line 3: rate limits (Pro/Max only — absent when not subscriber)
 if [ -n "$FIVE_H" ] || [ -n "$SEVEN_D" ]; then
