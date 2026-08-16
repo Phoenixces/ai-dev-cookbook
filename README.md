@@ -129,6 +129,67 @@ npx claude-mem status
 
 ---
 
+## Claude Code vs GitHub Copilot — When to Use Which
+
+Both tools have access: pick by task shape, not habit.
+
+| Signal | Use Claude Code | Use GitHub Copilot |
+|--------|----------------|--------------------|
+| **Scope** | Multi-file change, refactor, feature from scratch | Single file, completing a function, inline suggestion |
+| **Context needed** | Needs to understand the whole codebase, architecture, or a long spec | Needs only the open file + a few neighbors |
+| **Autonomy** | You want it to plan, run commands, edit, test, and iterate | You want to drive; it assists your keystrokes |
+| **Task type** | Debug a complex bug, write a design doc, migrate a library, review a diff, write tests for a module | Autocomplete a method body, generate boilerplate, quick lookup |
+| **Output** | Files changed, commands run, verified result | Inline suggestion accepted or dismissed |
+| **Cost** | Token-burn per turn (watch context %) | Near-free for inline completions |
+
+**Rule of thumb:**
+- Copilot = fast typist in your IDE. Great when you know what to write, just want it faster.
+- Claude Code = junior dev who can actually run things. Great when you're not sure *how* to write it, or when the task spans many files.
+
+**When both help:** Use Copilot while writing, then hand the diff to Claude Code for review, test generation, or cleanup.
+
+---
+
+## Model Selection Guide
+
+Claude Code defaults to the configured model. For agentic/coding tasks in Claude Code, `claude-opus-5` or `claude-sonnet-5` are the defaults. Swap via `/model` or set in settings.
+
+| Model | Best for | Avoid when |
+|-------|----------|------------|
+| **Claude Opus 5** (`claude-opus-5`) | Hard multi-file features, architectural decisions, long autonomous sessions, code review with high precision, complex debugging | Simple lookups, high-volume repetitive tasks — cost adds up |
+| **Claude Sonnet 5** (`claude-sonnet-5`) | Daily coding work, test generation, moderate refactors, agentic loops where Opus is overkill — ~60% the cost | The absolute hardest problems; very long-horizon planning |
+| **Claude Haiku 4.5** (`claude-haiku-4-5`) | Classification, quick summaries, high-volume batch operations, linting explanations | Anything requiring multi-step reasoning or code synthesis |
+| **Claude Fable 5** (`claude-fable-5`) | Hardest reasoning tasks that genuinely need the ceiling (frontier research, complex proof-like design work) | Everyday coding — expensive; also safety classifiers stricter |
+
+### Practical mapping
+
+```
+Overnight autonomous coding run   → Opus 5 (or Sonnet 5 if budget matters)
+"Explain this function"           → Haiku 4.5
+Feature from a 2-page spec        → Sonnet 5
+Refactor 20 files consistently    → Opus 5 (needs coherence across scope)
+Write tests for a module          → Sonnet 5
+Summarize a long PR               → Haiku 4.5
+Debug a subtle race condition     → Opus 5 (needs deep reasoning)
+Generate boilerplate CRUD         → Sonnet 5
+```
+
+### Effort level matters too
+
+Within a model, `effort` controls how deep it thinks. Set via `/effort` or `output_config.effort`:
+
+| Effort | Use |
+|--------|-----|
+| `low` | Latency-sensitive, simple tasks |
+| `medium` | Most interactive coding; good cost/quality balance |
+| `high` | Default; solid for complex tasks |
+| `xhigh` | Hard agentic/coding problems — default in Claude Code |
+| `max` | When correctness matters more than cost |
+
+**Cheapest path for good output:** `claude-sonnet-5` at `high` effort beats `claude-opus-5` at `low` effort on most coding tasks. Match both model and effort to the task.
+
+---
+
 ## Tips for Low Token Usage
 
 - **Use HEADROOM** before feeding logs or large file trees to Claude.
