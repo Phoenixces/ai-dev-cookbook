@@ -28,6 +28,9 @@ ollama pull qwen2.5-coder:3b
 ollama pull qwen2.5-coder:7b
 
 # Stronger reasoning model (~4.7 GB)
+ollama pull qwen3:4b
+
+# Stronger reasoning model (~4.7 GB)
 ollama pull deepseek-r1:8b
 ```
 
@@ -48,16 +51,27 @@ File: `~/.config/opencode/config.json`
   "$schema": "https://opencode.ai/config.json",
   "provider": {
     "ollama": {
-      "name": "Ollama",
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
       "options": {
         "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "qwen2.5-coder:3b": {
-          "name": "qwen2.5-coder:3b"
+        "qwen3:4b": {
+          "name": "qwen3:4b",
+          "tool_call": true,
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          }
         },
-        "deepseek-r1:8b": {
-          "name": "deepseek-r1:8b"
+        "llama3.2:latest": {
+          "name": "llama3.2:latest",
+          "tool_call": true,
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          }
         }
       }
     }
