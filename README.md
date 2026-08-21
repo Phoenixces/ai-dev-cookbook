@@ -4,11 +4,26 @@ Personal cookbook for getting the most out of Claude Code — better output qual
 
 ---
 
+## Table of Contents
+
+- [What's in here](#whats-in-here)
+- [Status Line](#status-line-statusfilesh)
+- [Skills (Custom Slash Commands)](#skills-custom-slash-commands)
+- [Agents vs Skills](#agents-vs-skills)
+- [Plugins & Tools](#plugins--tools)
+- [Claude Code vs GitHub Copilot](#claude-code-vs-github-copilot--when-to-use-which)
+- [Model Selection Guide](#model-selection-guide)
+- [Free Local Models — OpenCode + Ollama](#free-local-models--opencode--ollama)
+- [Tips for Low Token Usage](#tips-for-low-token-usage)
+
+---
+
 ## What's in here
 
 | File | Purpose |
 |------|---------|
 | `statusfile.sh` | Status line script — shows cost, context %, model, rate limits, git branch in the Claude Code terminal |
+| [`opencode-ollama.md`](opencode-ollama.md) | Free & unlimited local model setup — OpenCode + Ollama, no API keys needed |
 
 ---
 
@@ -187,6 +202,21 @@ Within a model, `effort` controls how deep it thinks. Set via `/effort` or `outp
 | `max` | When correctness matters more than cost |
 
 **Cheapest path for good output:** `claude-sonnet-5` at `high` effort beats `claude-opus-5` at `low` effort on most coding tasks. Match both model and effort to the task.
+
+## Free Local Models — OpenCode + Ollama
+
+Run models locally: no API keys, no cost, no rate limits. Full setup in [`opencode-ollama.md`](opencode-ollama.md).
+
+**Quick start:**
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen2.5-coder:3b   # ~1.9 GB, fast coder
+ollama pull deepseek-r1:8b     # ~4.7 GB, reasoning
+opencode .                      # switch model with /model inside
+```
+
+Configure OpenCode to use Ollama at `http://localhost:11434/v1` — see the full config and model table in [`opencode-ollama.md`](opencode-ollama.md).
 
 ---
 
